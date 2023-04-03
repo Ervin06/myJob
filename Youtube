@@ -1,0 +1,38 @@
+from pytube import YouTube
+import os
+
+choice = input("Что вы хотите скачать?\n1. Видео\n2. Аудио\nВыберите 1 или 2: ")
+
+if choice == '1':
+    link = input("Введите URL: ")
+    yt = YouTube(link)
+
+    stream = yt.streams.get_highest_resolution()
+    stream.download()
+
+    print("Готово!")
+    
+elif choice == '2':
+    video_url = input("Введите URL: ")
+
+    yt = YouTube(video_url)
+
+    try:
+        audio_stream = yt.streams.get_audio_only()
+        audio_file = audio_stream.download(timeout=300)
+
+        video_title = yt.title
+        audio_name = video_title + '.mp3'
+
+        file_counter = 1
+        while os.path.exists(audio_name):
+            audio_name = f"{video_title} ({file_counter}).mp3"
+            file_counter += 1
+
+        os.rename(audio_file, audio_name)
+        print(f'Успешно скачано аудио из видео "{video_title}" и сохранено в файл "{audio_name}".\nАвтор кода: Erwin')
+    except Exception as e:
+        print('Ошибка при скачивании аудио:', e, '\nАвтор кода: Erwin')
+
+else:
+    print("Ошибка: выберите 1 или 2") 
