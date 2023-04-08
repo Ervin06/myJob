@@ -1,38 +1,72 @@
-from pytube import YouTube
+from pytube import YouTube, Playlist
 import os
 
-choice = input("Что вы хотите скачать?\n1. Видео\n2. Аудио\nВыберите 1 или 2: ")
+
+choice = input("Что вы хотите скачать?\n1. Видео\n2. Аудио\n3. Плейлист\n\nВыберите 1 или 2 или 3: ")
 
 if choice == '1':
-    link = input("Введите URL: ")
+
+link = input("Введите URL: ")
+print("Начало загрузки...")
     yt = YouTube(link)
 
     stream = yt.streams.get_highest_resolution()
     stream.download()
 
-    print("Готово!")
-    
+print('Файл:' + yt.title + " успешно скачан")
+
 elif choice == '2':
-    video_url = input("Введите URL: ")
+video_url = input("Введите URL: ")
+print("Начало загрузки...")
 
     yt = YouTube(video_url)
 
-    try:
+ try:
         audio_stream = yt.streams.get_audio_only()
-        audio_file = audio_stream.download(timeout=300)
+audio_file = audio_stream.download(timeout=300)
 
         video_title = yt.title
-        audio_name = video_title + '.mp3'
+audio_name = f"{video_title}.mp3"
 
         file_counter = 1
         while os.path.exists(audio_name):
-            audio_name = f"{video_title} ({file_counter}).mp3"
+audio_name = f"{video_title} ({file_counter}).mp3"
             file_counter += 1
 
         os.rename(audio_file, audio_name)
-        print(f'Успешно скачано аудио из видео "{video_title}" и сохранено в файл "{audio_name}".\nАвтор кода: Erwin')
-    except Exception as e:
-        print('Ошибка при скачивании аудио:', e, '\nАвтор кода: Erwin')
+print(f'Успешно скачано аудио из видео "{video_title}" и сохранено в файл "{audio_name}".\nАвтор кода: Erwin')
+except Exception as e:
+print('Ошибка при скачивании аудио:', e, '\nАвтор кода: Erwin')
+
+elif choice == '3':
+playlist_url = input("Введите URL плейлиста: ")
+    playlist = Playlist(playlist_url)
+
+playlist_type = input("Выберите тип плейлиста:\n1. Видео\n2. Аудио\nВыберите 1 или 2: ")
+print("Начало загрузки...")
+
+if playlist_type == '1':
+folder_name, file_extension = 'playlist_videos', '.mp4'
+    elif playlist_type == '2':
+folder_name, file_extension = 'playlist_music', '.mp3'
+    else:
+print("Ошибка: выберите 1 или 2")
+        exit()
+
+os.makedirs(folder_name, exist_ok=True)
+
+for video in playlist.videos:
+ try:
+stream = video.streams.get_highest_resolution() if playlist_type == '1' else video.streams.get_audio_only()
+file_path = os.path.join(folder_name, f"{video.title}{file_extension}")
+stream.download(output_path=folder_name, filename=f"{video.title}{file_extension}")
+
+            print(
+f'Успешно скачано {"видео" if playlist_type == "1" else "аудио"} "{video.title}" и сохранено в файл "{file_path}"')
+except Exception as e:
+print(f'Ошибка при скачивании {"видео" if playlist_type == "1" else "аудио"} "{video.title}":', e)
+
+print("Готово!")
 
 else:
-    print("Ошибка: выберите 1 или 2") 
+print("Ошибка: выберите 1 или 2 или 3")
