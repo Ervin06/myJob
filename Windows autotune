@@ -1,0 +1,107 @@
+import webbrowser
+import tkinter as tk
+
+
+def download_program(program_name, download_url):
+    print(f"Скачиваем {program_name} с официального сайта...")
+    webbrowser.open(download_url)  # Открываем ссылку в браузере
+
+
+def download_selected_programs():
+    selected_programs = []
+
+    for key, var in program_vars.items():
+        if var.get() == 1:
+            selected_programs.append(key)
+
+    for choice in selected_programs:
+        if choice == '7':
+            download_graphics_card_drivers()
+        elif choice in programs:
+            program = programs[choice]
+            download_program(program['name'], program['url'])
+        else:
+            print(f"Неверный выбор: {choice}")
+
+
+def download_graphics_card_drivers():
+    driver_window = tk.Toplevel(root)
+    driver_window.title("Выбор видеокарты")
+
+    def download_drivers():
+        selected_driver = driver_var.get()
+        if selected_driver == 'NVIDIA':
+            download_program('NVIDIA GeForce', 'https://www.nvidia.com/en-gb/geforce/geforce-experience/')
+        elif selected_driver == 'AMD Radeon':
+            download_program('Radeon Software', 'https://www.amd.com/en/support')
+        else:
+            tk.messagebox.showinfo('Ошибка', 'Неправильно выбрана видеокарта.')
+
+    driver_label = tk.Label(driver_window, text="Выберите вашу видеокарту:")
+    driver_label.pack()
+
+    driver_var = tk.StringVar()
+    driver_var.set('NVIDIA')  # По умолчанию NVIDIA
+    nvidia_radio = tk.Radiobutton(driver_window, text="NVIDIA", variable=driver_var, value='NVIDIA')
+    nvidia_radio.pack()
+
+    amd_radio = tk.Radiobutton(driver_window, text="AMD Radeon", variable=driver_var, value='AMD Radeon')
+    amd_radio.pack()
+
+    download_button = tk.Button(driver_window, text="Скачать драйвера", command=download_drivers)
+    download_button.pack()
+
+
+root = tk.Tk()
+root.title("Программа для скачивания")
+
+# Определяем программы
+programs = {
+    '1': {
+        'name': 'DirectX',
+        'url': 'https://www.microsoft.com/en-us/download/details.aspx?id=35'
+    },
+    '2': {
+        'name': 'Visual C++',
+        'url': 'https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0'
+    },
+    '3': {
+        'name': '.NET Framework',
+        'url': 'https://dotnet.microsoft.com/download/dotnet-framework'
+    },
+    '4': {
+        'name': 'Discord',
+        'url': 'https://discord.com/download'
+    },
+    '5': {
+        'name': 'Steam',
+        'url': 'https://store.steampowered.com/about/'
+    },
+    '6': {
+        'name': 'Google Chrome',
+        'url': 'https://www.google.com/chrome/'
+    },
+    '7': {
+        'name': 'Драйверы видеокарты',
+        'url': None
+    }
+}
+
+# Определяем интерфейс пользователя
+choices_label = tk.Label(root, text="Доступные программы для скачивания:")
+choices_label.pack()
+
+program_vars = {}
+for key, program in programs.items():
+    program_var = tk.IntVar()
+    program_vars[key] = program_var
+    choice_text = f"{key}) {program['name']}"
+    choice_checkbox = tk.Checkbutton(root, text=choice_text, variable=program_var)
+    choice_checkbox.pack()
+
+download_button = tk.Button(root, text="Скачать выбранные программы", command=download_selected_programs)
+download_button.pack()
+
+root.mainloop()
+
+print("Завершение программы.")
